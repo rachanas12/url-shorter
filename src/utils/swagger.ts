@@ -1,6 +1,9 @@
-import swaggerJsdoc from 'swagger-jsdoc';
+import swaggerJSDoc from "swagger-jsdoc";
+import swaggerUi from "swagger-ui-express";
+import fs from "fs";
+import path from "path";
 
-const options = {
+const options : swaggerJSDoc.Options= {
   definition: {
     openapi: '3.0.0',
     info: {
@@ -31,7 +34,30 @@ const options = {
       },
     },
   },
-  apis: ['./src/routes/*.ts'],
+  apis: [
+    "./src/routes/*/*.ts", // Routes folder
+    "./src/routes/*.ts", // Routes folder
+    "./src/models/*.ts", // Models folder
+  ],
 };
 
-export const specs = swaggerJsdoc(options);
+const swaggerSpec = swaggerJSDoc(options);
+const filePath = path.join(process.cwd(), "public/swagger/main.js");
+
+fs.writeFile(
+  filePath,
+  `(async () => {
+      const docs = document.getElementById('docs');
+      const apiDescriptionDocument = ${JSON.stringify(swaggerSpec)};
+      docs.apiDescriptionDocument = apiDescriptionDocument;
+    })();
+`,
+  err => {
+    if (err) {
+      console.error("Error writing to file:", err);
+      return;
+    }
+    console.log("File has been written successfully.");
+  },
+);
+export { swaggerUi, swaggerSpec };

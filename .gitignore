@@ -32,3 +32,5 @@ coverage/
 
 # Docker
 docker-compose.override.yml
+# Local Netlify folder
+.netlify

@@ -3,12 +3,11 @@ import session from 'express-session';
 import passport from 'passport';
 import cors from 'cors';
 import helmet from 'helmet';
-import swaggerUi from 'swagger-ui-express';
 import dotenv from 'dotenv';
 
 import { connectDB } from './config/database';
 import { connectRedis } from './config/redis';
-import { specs } from './utils/swagger';
+import { swaggerUi, swaggerSpec } from './utils/swagger';
 import { logger } from './utils/logger';
 
 // Load environment variables before importing passport config
@@ -50,14 +49,14 @@ app.use(
 // Passport middleware
 app.use(passport.initialize());
 app.use(passport.session());
+app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec, { explorer: true }));
 
 // Routes
 app.use('/auth', authRoutes);
 app.use('/api', urlRoutes);
 app.use('/api/analytics', analyticsRoutes);
 
-// Swagger documentation
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(specs));
+
 
 // Error handling middleware
 app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
